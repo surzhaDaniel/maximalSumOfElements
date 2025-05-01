@@ -9,7 +9,9 @@ namespace MaximalSumOfElements;
 public class FileSumsAnalyzer
 {
     private readonly string _filePath;
-    private readonly CalculationStrategy _strategy;
+    private readonly List<(int lineNumber, double lineSum)> _validLines = new();
+    private readonly List<int> _brokenLines = new();
+    public CalculationStrategy Strategy { get; }
 
     public FileSumsAnalyzer(string filePath, CalculationStrategy calculationStrategy)
     {
@@ -19,14 +21,12 @@ public class FileSumsAnalyzer
         }
         
         _filePath = filePath;
-        _strategy = calculationStrategy;
+        Strategy = calculationStrategy;
     }
 
-    public (List<(int lineNumber, double lineSum)> sums, List<int> brokenLines) AnalyzeFile()
+    public void AnalyzeFile()
     {
         var numberFormat = CultureInfo.InvariantCulture;
-        var sums = new List<(int lineNumber, double lineSum)>();
-        var brokenLines = new List<int>();
         string[] lines = File.ReadAllLines(_filePath);
 
         for (int i = 0; i < lines.Length; i++)
@@ -50,24 +50,33 @@ public class FileSumsAnalyzer
 
             if (isBroken)
             {
-                brokenLines.Add(i + 1);
+                _brokenLines.Add(i + 1);
             }
             else
             {
-                sums.Add((i + 1, sum));
+                _validLines.Add((i + 1, sum));
             }
         }
-        if (!sums.Any())
+    }
+
+    public List<int> GetBrokenLines()
+    {
+        return new List<int> (_brokenLines);
+    }
+
+    public List<(int lineNumber, double lineSum)> GetLinesWithExtremeSum()
+    {
+        if (_validLines.Count == 0)
         {
-            return (new List<(int, double)>(), brokenLines);
+            return new List<(int, double)>();
         }
 
-        double target = _strategy == CalculationStrategy.Minimum
-            ? sums.Min(x => x.lineSum)
-            : sums.Max(x => x.lineSum);
-        var selectedSums = sums
+        double target = Strategy == CalculationStrategy.Minimum
+            ? _validLines.Min(x => x.lineSum)
+            : _validLines.Max(x => x.lineSum);
+
+        return _validLines
             .Where(x => x.lineSum == target)
             .ToList();
-        return (selectedSums,  brokenLines);
     }
 }

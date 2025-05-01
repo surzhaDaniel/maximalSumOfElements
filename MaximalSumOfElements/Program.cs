@@ -19,8 +19,8 @@ internal class Program
             string filePath = args.Length > 0 ? args[0] : GetFileFromUser();
             CalculationStrategy strategy = DetermineStrategy(args);
             FileSumsAnalyzer fileSumsAnalyzer = new(filePath, strategy);
-            var (sums, brokenLines) = fileSumsAnalyzer.AnalyzeFile();
-            PrintResult(sums, brokenLines, strategy);
+            fileSumsAnalyzer.AnalyzeFile();
+            PrintResult(fileSumsAnalyzer);
         }
         catch (Exception ex)
         {
@@ -50,9 +50,11 @@ internal class Program
         return path;
     }
 
-    private static void PrintResult(List<(int lineNumber, double lineSum)> sums, 
-        List<int> brokenLines, CalculationStrategy strategy)
+    private static void PrintResult(FileSumsAnalyzer fileSumsAnalyzer)
     {
+        var brokenLines = fileSumsAnalyzer.GetBrokenLines();
+        var sums = fileSumsAnalyzer.GetLinesWithExtremeSum();
+
         Console.Write("\nBroken lines: ");
         Console.WriteLine(brokenLines.Count == 0
         ? "None"
@@ -64,7 +66,7 @@ internal class Program
         }
         else
         {
-            Console.WriteLine(strategy == CalculationStrategy.Minimum ? "Minimal sum(s): " : "Maximal sum(s): ");
+            Console.WriteLine(fileSumsAnalyzer.Strategy == CalculationStrategy.Minimum ? "Minimal sum(s): " : "Maximal sum(s): ");
 
             foreach (var sum in sums)
             {

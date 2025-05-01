@@ -34,7 +34,10 @@ public class FileSumsAnalyzerTests
         _tempFilePath = CreateTempFile("1,2,3\n4,5,6\n7,8,9");
 
         var analyzer = new FileSumsAnalyzer(_tempFilePath, CalculationStrategy.Maximum);
-        var (sums, brokenLines) = analyzer.AnalyzeFile();
+        analyzer.AnalyzeFile();
+
+        var sums = analyzer.GetLinesWithExtremeSum();
+        var brokenLines = analyzer.GetBrokenLines();
 
         Assert.AreEqual(1, sums.Count);
         Assert.AreEqual(0, brokenLines.Count);
@@ -48,7 +51,10 @@ public class FileSumsAnalyzerTests
         _tempFilePath = CreateTempFile("1,2,3\n4,5,6\n7,8,9");
 
         var analyzer = new FileSumsAnalyzer(_tempFilePath, CalculationStrategy.Minimum);
-        var (sums, brokenLines) = analyzer.AnalyzeFile();
+        analyzer.AnalyzeFile();
+
+        var sums = analyzer.GetLinesWithExtremeSum();
+        var brokenLines = analyzer.GetBrokenLines();
 
         Assert.AreEqual(1, sums.Count);
         Assert.AreEqual(0, brokenLines.Count);
@@ -62,7 +68,9 @@ public class FileSumsAnalyzerTests
         _tempFilePath = CreateTempFile("1, 1, 1\n2,2,2\n3\n1,1,4");
 
         var analyzer = new FileSumsAnalyzer(_tempFilePath, CalculationStrategy.Minimum);
-        var (sums, brokenLines) = analyzer.AnalyzeFile();
+        analyzer.AnalyzeFile();
+
+        var sums = analyzer.GetLinesWithExtremeSum();
 
         Assert.AreEqual(2, sums.Count);
         CollectionAssert.AreEquivalent(new List<int> { 1, 3 }, sums.Select(s => s.lineNumber).ToList());
@@ -75,7 +83,9 @@ public class FileSumsAnalyzerTests
         _tempFilePath = CreateTempFile("1,2,3\nbad,data\n3,3,3\nok,9,10");
 
         var analyzer = new FileSumsAnalyzer(_tempFilePath, CalculationStrategy.Maximum);
-        var (sums, brokenLines) = analyzer.AnalyzeFile();
+        analyzer.AnalyzeFile();
+
+        var brokenLines = analyzer.GetBrokenLines();
 
         Assert.AreEqual(2, brokenLines.Count);
         CollectionAssert.AreEquivalent(new List<int> { 2, 4 }, brokenLines);
