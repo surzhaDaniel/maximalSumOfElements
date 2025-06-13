@@ -1,6 +1,8 @@
 ﻿using MaximalSumOfElements;
+using MaximalSumOfElements.Enums;
 using System;
 using System.IO;
+using System.Linq;
 
 internal class Program
 {
@@ -17,7 +19,7 @@ internal class Program
             }
 
             string filePath = args.Length > 0 ? args[0] : GetFileFromUser();
-            CalculationStrategy strategy = DetermineStrategy(args);
+            CalculationStrategyType strategy = DetermineStrategy(args);
             FileSumsAnalyzer fileSumsAnalyzer = new(filePath, strategy);
             fileSumsAnalyzer.AnalyzeFile();
             PrintResult(fileSumsAnalyzer);
@@ -29,16 +31,16 @@ internal class Program
             Environment.Exit(1);
         }
     }
-    private static CalculationStrategy DetermineStrategy(string[] args)
+    private static CalculationStrategyType DetermineStrategy(string[] args)
     {
         if (args.Length < 2)
         {
-            return CalculationStrategy.Maximum;
+            return CalculationStrategyType.Maximum;
         }
         return args[1] switch
         {
-            "-min" => CalculationStrategy.Minimum,
-            "-max" => CalculationStrategy.Maximum,
+            "-min" => CalculationStrategyType.Minimum,
+            "-max" => CalculationStrategyType.Maximum,
             _ => throw new ArgumentException($"Unknown mode '{args[1]}'. Use -min or -max.")
         };
     }
@@ -66,7 +68,7 @@ internal class Program
         }
         else
         {
-            Console.WriteLine(fileSumsAnalyzer.Strategy == CalculationStrategy.Minimum ? "Minimal sum(s): " : "Maximal sum(s): ");
+            Console.WriteLine("Extreme sum(s): ");
 
             foreach (var sum in sums)
             {
